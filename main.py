@@ -1,11 +1,18 @@
 import streamlit as st
-from bardapi import Bard
+import requests
+from bardapi import Bard, SESSION_HEADERS
 
 # Set your OpenAI API key here
-api_key = 'cghsxScUlSRzW3AgdLYnIGQcw2KdnJkgffmn2ZARftN_qO5Ub8LSaPJ5u6E2LCI71N3GoA.'
+token =  'cghsxScUlSRzW3AgdLYnIGQcw2KdnJkgffmn2ZARftN_qO5Ub8LSaPJ5u6E2LCI71N3GoA.'
+session = requests.Session()
+session.cookies.set("__Secure-1PSID", token)
+session.cookies.set( "__Secure-1PSIDCC", "ACA-OxMTd6Abw1aTx1sGeujfGXYjlQXsHKRzxMVE-7_s8FexdgGEKHxXQlhJpIueZwqVDPJd5w")
+session.cookies.set("__Secure-1PSIDTS", "sidts-CjIBNiGH7v2gpb2x_2XKZyV9qONMmcz31K752gM36B0mqIe1_6lDXdAn9OI-LrzH1MMnoxAA")
+session.headers = SESSION_HEADERS
+
+bard = Bard(token=token, session=session)
 
 def call_bard(query):
-    bard = Bard(token=api_key)
     answer = bard.get_answer(query)
     return (answer['content'])
 
