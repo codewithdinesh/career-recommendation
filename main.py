@@ -52,6 +52,11 @@ def call_bard(query):
     answer = bard.get_answer(query)
     return (answer['content'])
 
+# Function to delete a saved recommendation by ID
+def delete_recommendation(recommendation_id):
+    cursor.execute("DELETE FROM career_recommendations WHERE id=?", (recommendation_id,))
+    conn.commit()
+
 # App title and information
 st.title('Career Recommendation App')
 st.write("Welcome to the Career Recommendation App. Answer the following questions about your personality traits and receive career recommendations based on your answers.")
@@ -117,13 +122,22 @@ st.markdown("<br>", unsafe_allow_html=True)
 
 # Display recommendations from the database
 st.header("Saved Recommendations")
-saved_recommendations = cursor.execute("SELECT personality_traits, recommendations FROM career_recommendations ORDER BY id DESC").fetchall()
-for index, (traits, rec) in enumerate(saved_recommendations, start=1):
+saved_recommendations = cursor.execute("SELECT id, personality_traits, recommendations FROM career_recommendations ORDER BY id DESC").fetchall()
+for index, (id,traits, rec) in enumerate(saved_recommendations, start=1):
     st.write(f"### {index} Personality Traits:")
     st.text(traits)
     # st.write("\n\n### Personality Traits:", traits)
     st.write("\n #### Recommendations:")
     st.write(rec)
+
+    # "Delete" button with a delete icon for each recommendation
+    if st.button(f"Delete Recommendation {index}"):
+        delete_recommendation(id)
+
+        # After deletion, update the recommendations list and re-render
+        saved_recommendations = cursor.execute(
+            "SELECT id, personality_traits, recommendations FROM career_recommendations ORDER BY id DESC").fetchall()
+
     st.markdown("<hr>", unsafe_allow_html=True)
 
 # Close the database connection
